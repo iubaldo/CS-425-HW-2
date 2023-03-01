@@ -1,0 +1,109 @@
+<!--coneExercise.html
+
+	Written Fall 2020 by John Bell for CS 425
+    Last revised Spring 2023 by John Bell
+    
+    This file uses the Cone class
+ -->
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>cone Exercise Using a Class</title>
+
+<!-- First to load up the external javascript files. -->
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="coneExercise.js"></script>	<!-- Main application -->
+<script type="text/javascript" src="cone.js"></script>	<!-- Cone class -->
+<script type="text/javascript" src="truncatedCone.js"></script>	 <!-- Truncated Cone class -->
+
+<!-- Next the vertex shader ------------------------------------------------------------------>
+
+<script id="vertex-shader" type="x-shader/x-vertex" >
+
+	// Attributes are values that vary from vertex to vertex 
+	attribute vec3 vPosition;	// Vertex position data in 3D space
+	attribute vec3 vColor;		// Vertex color data - Not needed for all applications
+	
+	// Uniform variables are shared for all vertices 
+	uniform mat4 uModelXform;	// Transforms the model into World coordinates
+	uniform mat4 uViewXform;	// Transforms the view by moving all objects in inverse sense.
+	uniform mat4 uProjection;	// Camera Projection Matrix, e.g. lens parameters.
+	
+	// Varying values are passed from vertex shader to fragment shader, as interpolated values 
+	varying vec4 fColor;		// Interpolated color 
+	
+	void main( ) {
+		precision mediump float;
+		
+		// Pass-throughs to fragment shader
+		fColor = vec4( vColor, 1 );
+		
+		// Minimal functionality passes through position and ends.
+		// gl_Position = vec4( vPosition, 1.0 );
+	
+		// TODO 2 - Apply the Model  transformation alone
+		// gl_Position = uModelXform * vec4( vPosition, 1.0 );
+		
+		// TODO 3 / Apply Model and View transformations
+		// gl_Position = uViewXform * uModelXform * vec4( vPosition, 1.0 );
+		
+		// TODO 4 - Add in the projection transformation
+		gl_Position = uProjection * uViewXform * uModelXform * vec4( vPosition, 1.0 );
+		
+		return;		
+		
+	} // end of main( ) of vertex shader
+
+</script>	<!--	End of vertex shader -->
+
+<!--  Next the fragment shader  -------------------------------------------------------------->
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+	precision mediump float;
+	
+	// Varying variables are interpolated between vertices of a triangle
+	varying vec4 fColor;			// Fragment color - Not needed in all applications
+	
+	// Uniform variables are shared for all fragments 
+	// None needed for a simple shader.
+
+	void main( ) {
+		
+		// The simplest fragment shader picks a solid color
+		// gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 ); // Red
+		
+		// Next simplest uses the color passed through from the vertex shader 
+		// ( or from a uniform variable. )
+		gl_FragColor = fColor;
+			
+		return;
+	
+	} // End of main( ) for fragment shader
+	
+</script>	<!-- End of fragment shader ------------------------------------------------->
+
+</head>
+
+<!-- End of all the scripts.  Now here is the actual web page -->
+
+<body>
+<h3 align="center">Lab Exercise Program Using the Cone Class<br />
+John Bell - 
+Fall 2020 - 
+CS 425</h3>
+<p></p>
+
+<canvas id="gl-canvas" width="600" height="400">
+  Ooops No Canvas Found
+</canvas>
+<p>
+  This line is after the canvas
+</p>
+</body>
+</html>
