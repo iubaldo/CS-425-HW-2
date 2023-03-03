@@ -1,12 +1,6 @@
-/* coneClassExercise.js
-//	
-//	Written by John Bell for CS 425, Fall 2020
-//  Last revised Spring 2023 by John Bell
-    
-    This file creates and uses instances of the Cone class
-	It also draws a set of axes manually for reference.
-	( TODO someday - Create an Axes class and instantiate an Axes object. )
-    
+/* main.js
+	name: Ian Ubaldo
+	netid: iubaldo2
 */
 
 // Globals are evil, but necessary when callback functions are used

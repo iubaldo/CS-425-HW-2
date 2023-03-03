@@ -1,13 +1,6 @@
 /* truncatedCone.js
-	
-	Originally written by John Bell for CS 425, Fall 2020
-	Last revised Spring 2023 by John Bell
-    
-    This file contains code to create and draw a unit cone, centered at the origin.
-	
-	Many steps are incomplete and/or commented out for exercise purposes.
-    
-	Modified by Ian Ubaldo
+	name: Ian Ubaldo
+	netid: iubaldo2
 */
 
 // Globals are evil.  We won't use any here. :-)
