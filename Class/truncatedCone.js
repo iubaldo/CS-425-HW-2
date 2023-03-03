@@ -1,12 +1,13 @@
-/* cone.js
+/* truncatedCone.js
 	
-	Written by John Bell for CS 425, Fall 2020
+	Originally written by John Bell for CS 425, Fall 2020
 	Last revised Spring 2023 by John Bell
     
     This file contains code to create and draw a unit cone, centered at the origin.
 	
 	Many steps are incomplete and/or commented out for exercise purposes.
     
+	Modified by Ian Ubaldo
 */
 
 // Globals are evil.  We won't use any here. :-)
@@ -38,11 +39,6 @@ class TruncatedCone{
 	
 		// Generate Points and Colors
 		
-		// TODO 3 - push vec3s into the colors array for each vertex.
-		// If the passed color is valid, use it to make a vec3.  
-		// Otherwise use calls to Math.random( ).
-		// This object uses one vertex at the point and nSectors + 1 around the base.
-		
 		for( var i = 0; i < (nSectors + 2) * 4 + 1; i++ ) {
 			if( validColor ) {
 				// Push the passed-in valid color here, as a vec3
@@ -62,28 +58,28 @@ class TruncatedCone{
 			var theta = i * dTheta;
 			positions.push(vec3(ratio * Math.cos(theta), 1, ratio * Math.sin(theta)));
 		}	
-    console.log(positions);
+    // console.log(positions);
 
     // bottom vertex (bottom base center)
     positions.push(vec3(0, 0, 0));
 
     // bottom base
     dTheta = 2 * Math.PI / this.nSectors;
-		for( i = 0; i < this.nSectors + 1; i++ ) { // Duplicate ( 1, 0, 0 ) to close loop.
+		for( i = 0; i < this.nSectors + 1; i++ ) { // Duplicate first point to close loop
 			var theta = i * dTheta;
 			positions.push(vec3(Math.cos(theta), 0, Math.sin(theta)));
 		}	
-    console.log(positions);
+    // console.log(positions);
 
 		// faces - need to push alternating + skip vertex
-		for( i = 0; i < this.nSectors + 1; i++ ) { // Duplicate ( 1, 0, 0 ) to close loop.
+		for( i = 0; i < this.nSectors + 1; i++ ) { // Duplicate first point to close loop
 			positions.push(positions[i + 1]);
       positions.push(positions[i + 1 + nSectors + 2]);
 		}
     positions.push(positions[1]);
     positions.push(positions[1 + nSectors + 2]);
     positions.push(positions[2]);
-    console.log(positions);
+    // console.log(positions);
 
 		// Push vertex position data to GPU
 		// Hold off on connecting the data to the shader variables

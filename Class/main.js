@@ -27,7 +27,9 @@ var theSolidCone;		// Solid color Cone object
 var nConeSectors = 15;	// Number of sectors in first cone
 var nConeSectors2 = 11;	// Number of sectors in second cone
 
-var truncCone;
+
+var merryGoRound;
+var eyePos;
 
 
 var time = 0;
@@ -59,8 +61,6 @@ window.onload = function init( ) {
 	var axesColors = [ ];	// Vertex color data for axes
 	
 	// Generate Points and Colors
-	
-	// First the points and colors for the axes.
 	
 	// Two points with colors for a red axis in the X direction
 	axesPoints.push( vec3( 0, 0, 0 ) );
@@ -98,22 +98,11 @@ window.onload = function init( ) {
 	gl.bufferData( gl.ARRAY_BUFFER, flatten( axesColors ), gl.STATIC_DRAW );
 	
 	// Unbind the buffer, for safety sake.
-	
 	gl.bindBuffer( gl.ARRAY_BUFFER, null );
 
-	// Next the cone.  The buffer IDs are instance variables within the Cone class
-	// TODO 3 - Pass parameters to create a cone, using "0" ( an invalid color ) 
-	//         for the color parameter
 	
-	// theCone = new Cone( . . . ); // Uncomment and complete this line
-	theCone = new Cone(gl, program, 8, 0);
-	
-	// TODO 5 - Create a solid color cone passing [ r, g, b ] for the color parameter, 
-	// where r, g, and b are valid color parameters.
-	
-	theSolidCone = new Cone(gl, program, 8, [0.5, 0.5, 0.2]);
-
 	truncCone = new TruncatedCone(gl, program, 6, 0, 0.5);
+	merryGoRound = new MerryGoRound(gl, program);
 	
 	gl.enable( gl.DEPTH_TEST );	// Note:  This line had an error in the exercise template.
 	
@@ -125,72 +114,66 @@ function render( ) {
 	
 	// Clear out the color buffers and the depth buffers.
 	gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
-	
-	// Create mat4 transformation matrices as needed to transform things.
-	// May include model transformation, camera movement, and camera projection
-	// Initially let them all be identity matrices
-	
-	// Create uViewXform using lookAt( eye, at, up );
-	// Push it to the GPU as a uniform variable.
+
+	eyePos = vec3( 7, 3, -7 );
 	var uViewXform = mat4( ); // Identity matrix unless changed otherwise.
-	// TODO 1 - Uncomment the following and adjust parameters for a "nice" view.
-	var uViewXform = lookAt( vec3( 1, 2, -3 ), vec3( 0, 0, 0 ), vec3( 0, 1, 0 ) );
+	var uViewXform = lookAt( eyePos, vec3( 0, 0, 0 ), vec3( 0, 1, 0 ) );
 	var uViewXformLoc = gl.getUniformLocation( program, "uViewXform" );
 	gl.uniformMatrix4fv( uViewXformLoc, false, flatten( uViewXform ) );
 	
-	// Create another mat4 using perspective( ) and send it to the GPU
-	
 	var uProjection = mat4( ); // Identity matrix unless changed otherwise.
-	// TODO 2 - uncomment and adjust the following for a good 3D perspective
-	var uProjection = perspective( 60, aspectRatio, 0.1, 10.0 );
+	var uProjection = perspective( 60, aspectRatio, 0.1, 50.0 );
 	var uProjectionLoc = gl.getUniformLocation( program, "uProjection" );
 	gl.uniformMatrix4fv( uProjectionLoc, false, flatten( uProjection ) );
-	
-	// Set the model transformation matrix as a mat4 Identity matrix and send it to the GPU
-	// This will be changed in render( ), but set something there for now as a placeholder
 	
 	var uModelXform = mat4( ); // Identity matrix unless changed otherwise.
 	var uModelXformLoc = gl.getUniformLocation( program, "uModelXform" );
 	gl.uniformMatrix4fv( uModelXformLoc, false, flatten( uModelXform ) );
 	
-	// Okay.  All transformaation matrices sent to uniform variables.
-	// Time to attach vertex shader variables to the buffers created in init( )
-	
+
 	// Connect the axes vertex data to the shader variables - First positions
-	gl.bindBuffer( gl.ARRAY_BUFFER, vbufferID_axes );
-		var vPositionLoc = gl.getAttribLocation( program, "vPosition" );
-		gl.vertexAttribPointer( vPositionLoc, 3, gl.FLOAT, false, 0, 0 );
-		gl.enableVertexAttribArray( vPositionLoc );
+	bindDataToBuffer(vbufferID_axes, "vPosition", 3);
 	
 	// Then the axes colors
-	gl.bindBuffer( gl.ARRAY_BUFFER, cbufferID_axes );
-		var vColorLoc = gl.getAttribLocation( program, "vColor" );
-		gl.vertexAttribPointer( vColorLoc, 3, gl.FLOAT, false, 0, 0 );
-		gl.enableVertexAttribArray( vColorLoc );
+	bindDataToBuffer(cbufferID_axes, "vColor", 3);
+
+	// Draw the axes, using the transformations set above.
+	gl.drawArrays( gl.LINES, 0, nAxesPoints );
+	
+	gl.uniformMatrix4fv(uModelXformLoc, false, flatten(uModelXform));  // And push it to the GPU
+	
+
+
+	var time = 0;
+	var rotAngle = 0;
+	var loop = function() {
+		gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+
+		uViewXform = lookAt( eyePos, vec3( 0, 0, 0 ), vec3( 0, 1, 0 ) );
+		uViewXformLoc = gl.getUniformLocation( program, "uViewXform" );
+		gl.uniformMatrix4fv( uViewXformLoc, false, flatten( uViewXform ) );
+
+		uModelXform = rotate(rotAngle, vec3(0, 1, 0));
+		gl.uniformMatrix4fv(uModelXformLoc, false, flatten(uModelXform));
+
+		// truncCone.render();
+		merryGoRound.render(uModelXform, time);
+
+		rotAngle += 1;
+		rotAngle = rotAngle % 360;
+		time += 1;
+		requestAnimationFrame(loop);
+	}
+	requestAnimationFrame(loop);
+}
+
+
+function bindDataToBuffer(bindData, bindVar, size) {
+	gl.bindBuffer( gl.ARRAY_BUFFER, bindData );
+		var vLoc = gl.getAttribLocation( program, bindVar );
+		gl.vertexAttribPointer( vLoc, size, gl.FLOAT, false, 0, 0 );
+		gl.enableVertexAttribArray( vLoc );
 	
 	// Unbind the buffer, for safety sake.
 	gl.bindBuffer( gl.ARRAY_BUFFER, null );
-
-	// Draw the axes, using the transformations set above.
-	gl.drawArrays( gl.LINES, 0, nAxesPoints );	// Or gl.TRIANGLES, or . . .
-	
-	// Now to draw the first cone, using a different set of buffers and Indices
-	
-	// Reset the transformation to scale down the cone so the axes are visible.
-	// ( Note that the cone is centered on the origin, standing on the Y = 0 plane. )
-	
-	uModelXform = rotate(270, vec3(1, 0, 0));
-	gl.uniformMatrix4fv(uModelXformLoc, false, flatten(uModelXform));  // And push it to the GPU
-	
-	// And finally to draw the cone
-	
-	truncCone.render();
-	
-	// uModelXform = mult( translate(1, 0, 2), scalem(1, 1, 1) );
-	// gl.uniformMatrix4fv(uModelXformLoc, false, flatten(uModelXform));
-
-	// Schedule a redraw if appropriate
-	//if( ??? ) 
-	//	requestAnimFrame( render );
-	
 }

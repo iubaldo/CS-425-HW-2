@@ -11,16 +11,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>cone Exercise Using a Class</title>
+<title>CS 425 HW 2</title>
 
 <!-- First to load up the external javascript files. -->
 
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" src="coneExercise.js"></script>	<!-- Main application -->
+<script type="text/javascript" src="main.js"></script>	<!-- Main application -->
 <script type="text/javascript" src="cone.js"></script>	<!-- Cone class -->
 <script type="text/javascript" src="truncatedCone.js"></script>	 <!-- Truncated Cone class -->
+<script type="text/javascript" src="merryGoRound.js"></script>	
 
 <!-- Next the vertex shader ------------------------------------------------------------------>
 
@@ -43,17 +44,7 @@
 		
 		// Pass-throughs to fragment shader
 		fColor = vec4( vColor, 1 );
-		
-		// Minimal functionality passes through position and ends.
-		// gl_Position = vec4( vPosition, 1.0 );
-	
-		// TODO 2 - Apply the Model  transformation alone
-		// gl_Position = uModelXform * vec4( vPosition, 1.0 );
-		
-		// TODO 3 / Apply Model and View transformations
-		// gl_Position = uViewXform * uModelXform * vec4( vPosition, 1.0 );
-		
-		// TODO 4 - Add in the projection transformation
+
 		gl_Position = uProjection * uViewXform * uModelXform * vec4( vPosition, 1.0 );
 		
 		return;		
@@ -75,11 +66,6 @@
 
 	void main( ) {
 		
-		// The simplest fragment shader picks a solid color
-		// gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 ); // Red
-		
-		// Next simplest uses the color passed through from the vertex shader 
-		// ( or from a uniform variable. )
 		gl_FragColor = fColor;
 			
 		return;
@@ -93,9 +79,9 @@
 <!-- End of all the scripts.  Now here is the actual web page -->
 
 <body>
-<h3 align="center">Lab Exercise Program Using the Cone Class<br />
-John Bell - 
-Fall 2020 - 
+<h3 align="center">CS 425 HW 2<br />
+Ian Ubaldo - 
+Spring 2023 - 
 CS 425</h3>
 <p></p>
 
